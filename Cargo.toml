@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+serde_json = "1.0.140"
+serde = { version = "1.0.218", features = ["derive"] }
+axum = "0.8.1"  
+tokio-tower = { version = "0.6.0", features = ["fs", "trace"]
+tokio = { version = "1.44.0", features = ["full"] }
+tera = "1.20.0"
+
