@@ -3,6 +3,7 @@ use axum::{
     response::Html,
     routing::{get, post},
     Router,
+    Json
 };
 use rand::prelude::*;
 use serde::Deserialize;
@@ -24,6 +25,19 @@ struct Stats {
     movespeed: u16,
     mp: u16,
     spellblock: u16,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+struct CheckStats {
+    armor: String,
+    attackrange: String,
+    attackdamage: String,
+    attackspeed: String,
+    hp: String,
+    hpregen: String,
+    movespeed: String,
+    mp: String,
+    spellblock: String,
 }
 
 struct AppState {
@@ -48,7 +62,7 @@ async fn main() {
         .nest_service("/styles", ServeDir::new("src/frontend/styles"))
         .nest_service("/champ_images", ServeDir::new("attic/img/champion/splash"))
         .nest_service("/stats", ServeDir::new("attic/img/perk-images/StatMods"))
-        .nest_service("/items", ServeDir::new("attic/15.5.1/img/item"))
+        .nest_service("/items", ServeDir::new("attic/15.6.1/img/item"))
         .with_state(state);
 
     // run our app with hyper, listening globally on port 3000
@@ -56,7 +70,9 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn check_stat(State(_state): State<Arc<AppState>>) -> Html<String> {
+async fn check_stat(Json(payload): Json<CheckStats>, State(_state): State<Arc<AppState>>) -> Html<String> {
+    println!("{:#?}", payload);
+    
     Html("dunno mate".to_string())
 }
 
@@ -88,7 +104,7 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
 }
 
 fn aggregate_data() -> HashMap<String, Stats> {
-    let champs_dir = fs::read_dir("attic/15.5.1/data/en_US/champion").unwrap();
+    let champs_dir = fs::read_dir("attic/15.6.1/data/en_US/champion").unwrap();
     let mut champs: HashMap<String, Stats> = HashMap::new();
     for champ_path in champs_dir {
         let path = champ_path.unwrap();
