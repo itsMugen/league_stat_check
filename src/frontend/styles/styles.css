@@ -1,7 +1,7 @@
 .display_champs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
   width: 100vw;
   height: 100vh;
   justify-items: center;
@@ -9,7 +9,14 @@
 }
 
 .stats {
-  grid-column: span 2;
+  display: grid;
+  grid-column-start: 2;
+  grid-row-start: 1;
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.selector { 
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
@@ -18,6 +25,11 @@
   width: 45vw;
   margin: 17px;
 }
+
+.stats img {
+  grid-column: span 3;
+}
+
 body { 
   margin: 0px;
 } 

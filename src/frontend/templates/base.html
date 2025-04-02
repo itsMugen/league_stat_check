@@ -15,9 +15,12 @@
           "mana", "magic_resist"] %}
         {% set item = [1029, 1043, 1036, 1042, 1028, 1006, 1001, 1027, 1033] %}
         {% for index in [ 0,1,2,3,4,5,6,7,8 ] %}
-          <input type="radio" name="{{ stat[index] }}" value="{{ stat[index] }}" id="{{ champion_name_1 }}" />
           <img src="items/{{ item[index] }}.png" alt=""/>
-          <input type="radio" name="{{ stat[index] }}" value="{{ stat[index] }}" id="{{ champion_name_2 }}" />
+          <div>
+            <input type="radio" name="{{ stat[index] }}" value="{{ stat[index] }}" id="{{ champion_name_1 }}" />
+            <input type="radio" name="{{ stat[index] }}" value="{{ stat[index] }}" id="draw" />
+            <input type="radio" name="{{ stat[index] }}" value="{{ stat[index] }}" id="{{ champion_name_2 }}" />
+          </div>
         {% endfor %}
 
       </div>
