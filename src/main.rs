@@ -1,9 +1,8 @@
 use axum::{
-    extract::State,
-    response::Html,
+    extract::{Form, State},
+    response::{Html, IntoResponse},
     routing::{get, post},
     Router,
-    Json
 };
 use rand::prelude::*;
 use serde::Deserialize;
@@ -27,8 +26,26 @@ struct Stats {
     spellblock: u16,
 }
 
+impl Stats {
+    pub fn as_list(&self) -> [f32; 9] {
+        [
+            self.armor.into(),
+            self.attackrange.into(),
+            self.attackdamage.into(),
+            self.attackspeed,
+            self.hp.into(),
+            self.hpregen,
+            self.movespeed.into(),
+            self.mp.into(),
+            self.spellblock.into(),
+        ]
+    }
+}
+
 #[derive(Deserialize, Debug, Clone)]
 struct CheckStats {
+    champ_1: String,
+    champ_2: String,
     armor: String,
     attackrange: String,
     attackdamage: String,
@@ -36,8 +53,24 @@ struct CheckStats {
     hp: String,
     hpregen: String,
     movespeed: String,
-    mp: String,
-    spellblock: String,
+    mana: String,
+    magic_resist: String,
+}
+
+impl CheckStats {
+    pub fn get_guesses(self) -> [String; 9] {
+        [
+            self.armor,
+            self.attackrange,
+            self.attackdamage,
+            self.attackspeed,
+            self.hp,
+            self.hpregen,
+            self.movespeed,
+            self.mana,
+            self.magic_resist,
+        ]
+    }
 }
 
 struct AppState {
@@ -60,9 +93,12 @@ async fn main() {
         .route("/stat_check", get(stat_check))
         .route("/check_stats", post(check_stat))
         .nest_service("/styles", ServeDir::new("src/frontend/styles"))
-        .nest_service("/champ_images", ServeDir::new("attic/img/champion/splash"))
+        .nest_service("/champ_images", ServeDir::new("attic/img/champion/centered"))
         .nest_service("/stats", ServeDir::new("attic/img/perk-images/StatMods"))
-        .nest_service("/items", ServeDir::new("attic/15.6.1/img/item"))
+        .nest_service("/items", ServeDir::new("attic/15.5.1/img/item"))
+        .nest_service("/scripts", ServeDir::new("src/frontend/scripts"))
+        //eventually all used assets will be moved under assets
+        .nest_service("/assets", ServeDir::new("assets/"))
         .with_state(state);
 
     // run our app with hyper, listening globally on port 3000
@@ -70,10 +106,45 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn check_stat(Json(payload): Json<CheckStats>, State(_state): State<Arc<AppState>>) -> Html<String> {
-    println!("{:#?}", payload);
-    
-    Html("dunno mate".to_string())
+async fn check_stat(
+    State(state): State<Arc<AppState>>,
+    Form(payload): Form<CheckStats>,
+) -> impl IntoResponse {
+    let champ_list = state.champion_list.clone();
+    let stat_1 = champ_list.get(&payload.champ_1).unwrap().as_list();
+    let mut stat_2 = champ_list.get(&payload.champ_2).unwrap().as_list();
+
+    //try to swap for an array here
+    let mut checked: Vec<String> = Vec::new();
+    for (a, b) in stat_1.iter().zip(stat_2.iter_mut()) {
+        if a > b {
+            checked.push(payload.champ_1.to_string())
+        } else if a < b {
+            checked.push(payload.champ_2.to_string())
+        } else {
+            checked.push("draw".to_string())
+        }
+    }
+
+    let mut score : Vec<bool> = Vec::new();
+    let mut score_count: i8 = 0;
+    for (guess, truth) in payload.clone().get_guesses().iter().zip(checked.iter_mut()){
+        if guess == truth {
+            score.push(true);
+            score_count+=1;
+        } else {
+            score.push(false);
+        }
+    }
+
+    let mut context = Context::new();
+    context.insert("score", &score_count);
+    context.insert("guess_bool", &score);
+    context.insert("correct_guess", &checked);
+    context.insert("player_guess", &payload.get_guesses());
+    let rendered = state.templates.render("score.html", &context).unwrap();
+
+    Html(rendered)
 }
 
 async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
@@ -89,14 +160,14 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
     //create page
     let mut context = Context::new();
     if champ_1.unwrap() == "Fiddlesticks" {
-        context.insert("champion_name_1", "FiddleSticks");
-        context.insert("champion_name_2", &champ_2.unwrap());
+        context.insert("champ_1", "FiddleSticks");
+        context.insert("champ_2", &champ_2.unwrap());
     } else if champ_2.unwrap() == "Fiddlesticks" {
-        context.insert("champion_name_1", &champ_1.unwrap());
-        context.insert("champion_name_2", "FiddleSticks");
+        context.insert("champ_1", &champ_1.unwrap());
+        context.insert("champ_2", "FiddleSticks");
     } else {
-        context.insert("champion_name_1", &champ_1.unwrap());
-        context.insert("champion_name_2", &champ_2.unwrap());
+        context.insert("champ_1", &champ_1.unwrap());
+        context.insert("champ_2", &champ_2.unwrap());
     }
 
     let rendered = state.templates.render("base.html", &context).unwrap();
@@ -104,7 +175,7 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
 }
 
 fn aggregate_data() -> HashMap<String, Stats> {
-    let champs_dir = fs::read_dir("attic/15.6.1/data/en_US/champion").unwrap();
+    let champs_dir = fs::read_dir("attic/15.5.1/data/en_US/champion").unwrap();
     let mut champs: HashMap<String, Stats> = HashMap::new();
     for champ_path in champs_dir {
         let path = champ_path.unwrap();
@@ -123,6 +194,6 @@ fn aggregate_data() -> HashMap<String, Stats> {
     champs
 }
 
-fn print_type<T>(_: &T) {
+fn _print_type<T>(_: &T) {
     println!("{:?}", std::any::type_name::<T>());
 }

@@ -1,0 +1,17 @@
+<div>
+  <div id="score">
+    {{ score }}/9 
+  </div>
+  {% set stat = ["armor", "attackrange", "attackdamage", "attackspeed", "hp", "hpregen", "movespeed", 
+      "mana", "magic_resist"] %}
+  {% set item = [1029, 1043, 1036, 1042, 1028, 1006, 1001, 1027, 1033] %}
+  {% for index in [ 0,1,2,3,4,5,6,7,8 ] %}
+      <div class="result">
+        {{stat[index]}}
+        <img src="/items/{{item[index]}}.png" alt="">
+        <img src="/assets/{{guess_bool[index]}}.png" alt="">
+        your guess: {{ player_guess[index] }} 
+        correct guess: {{correct_guess[index]}}
+      </div>
+  {% endfor %}
+</div>

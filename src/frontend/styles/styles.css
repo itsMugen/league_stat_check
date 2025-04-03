@@ -6,30 +6,102 @@
   height: 100vh;
   justify-items: center;
   align-items: center;
+  position: absolute;
+  z-index: 1;
 }
 
 .stats {
-  display: grid;
   grid-column-start: 2;
   grid-row-start: 1;
-  grid-template-columns: 1fr;
   justify-items: center;
 }
 
-.selector { 
+.guesses { 
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  margin: 4px;
+}
+
+.container {
+  height: 4rem;
+  width: 4rem;
+  border-radius: 1rem;
+  border: solid 2px #c8aa6e;
+  margin: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  background: #e0dad4;
+  box-shadow: 2px 4px 1rem black;
 }
 
 .champion img {
-  width: 45vw;
-  margin: 17px;
+  border: solid 4px #c8aa6e;
+  border-radius: 2rem;
+  width: 40vw;
+  margin: 1vw;
+  box-shadow: 2px 8px 1rem black;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  border: solid 1px black;
 }
 
 .stats img {
-  grid-column: span 3;
+  height: 2rem;
+  width: 2rem;
+}
+
+label {
+  color: white;
+  text-shadow: 2px 4px black;
+  margin: 4px;
+  font-family: tahoma;
+  font-size: 2rem;
+}
+
+button {
+  padding: 1rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  box-shadow: 2px 2px 1rem #c8aa6e;
+  background: #c8aa6e;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+}
+
+button:hover {
+  background: #e0d2b5;
+}
+
+form {
+  display: grid;
+  grid-template: 1fr;
+  justify-items: center;
 }
 
 body { 
   margin: 0px;
-} 
+  position:relative;
+  background-color: black;
+}
+
+.background{
+  position: absolute;
+  background-image: url("/assets/background.jpg");
+  opacity: 0.3;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+input{ 
+  height: 4rem;
+  width: 4rem;
+  border-radius: 1rem;
+  margin: 0;
+  opacity: 0;
+}
+
