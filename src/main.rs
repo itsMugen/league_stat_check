@@ -183,9 +183,6 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
         context.insert("champ_2", &champ_2.unwrap());
     }
 
-    println!("{:#?} {:#?}", champ_1, champ_map.get(champ_1.unwrap()));
-    println!("{:#?} {:#?}", champ_2, champ_map.get(champ_2.unwrap()));
-
     let rendered = state.templates.render("base.html", &context).unwrap();
     Html(rendered)
 }
