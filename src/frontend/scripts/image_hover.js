@@ -7,7 +7,6 @@ function fill_image(element, imageUrl) {
 
 function remove_image(element) { 
     if (list_elements.includes(element)){
-        console.log(list_elements);
         ;
     } else {
         element.style.backgroundImage = "none";
@@ -44,7 +43,6 @@ function fill_onclick(element, imageUrl) {
 }
 
 function activate_submit(){
-    console.log("me");
     if (list_elements.length == 9){
         let button = document.getElementById("check_them_stats");
         button.style.display = "flex";
