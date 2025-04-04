@@ -46,6 +46,12 @@ function activate_submit(){
     if (list_elements.length == 9){
         let button = document.getElementById("check_them_stats");
         button.style.display = "flex";
+
+        //sometimes the inputs are not properly selected
+        //once clicked
+        list_elements.forEach(element => {
+            element.children[0].checked = true;
+        });
     }
 
 }
