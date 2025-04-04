@@ -137,7 +137,9 @@ footer{
   left:0;
   right: 0;
   height: 5vh;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 a {
