@@ -42,3 +42,17 @@ function fill_onclick(element, imageUrl) {
         list_elements.push(element);
     }
 }
+
+function activate_submit(){
+    console.log("me");
+    if (list_elements.length == 9){
+        let button = document.getElementById("check_them_stats");
+        button.style.display = "flex";
+    }
+
+}
+
+function purge() {
+    list_elements = new Array();
+    list_ids = new Array();
+}

@@ -53,7 +53,7 @@ struct CheckStats {
     hp: String,
     hpregen: String,
     movespeed: String,
-    mana: String,
+    resource_bar: String,
     magic_resist: String,
 }
 
@@ -67,7 +67,7 @@ impl CheckStats {
             self.hp,
             self.hpregen,
             self.movespeed,
-            self.mana,
+            self.resource_bar,
             self.magic_resist,
         ]
     }
@@ -137,7 +137,19 @@ async fn check_stat(
         }
     }
 
+    let comment : &str;
+
+    match score_count {
+        0 => comment = "are you even trying?",
+        1..=3 =>  comment = "I've seen better iron players",
+        4..=6 => comment = "Truly a coinflipper",
+        7..=8 => comment = "You might actually know something",
+        9 => comment = "Meh.. just lucky admit it",
+        _ => comment = "You broke something",
+    };
+
     let mut context = Context::new();
+    context.insert("comment", &comment);
     context.insert("score", &score_count);
     context.insert("guess_bool", &score);
     context.insert("correct_guess", &checked);
@@ -151,11 +163,12 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
     //pick 2 random champs
     let champ_map = state.champion_list.clone();
     let mut rng = rand::rng();
-    let mut champ_names: Vec<String> = champ_map.into_keys().collect();
+    let mut champ_names: Vec<String> = champ_map.clone().into_keys().collect();
     champ_names.shuffle(&mut rng);
     let mut champs = champ_names.choose_multiple(&mut rng, 2);
     let champ_1 = champs.next();
     let champ_2 = champs.next();
+    
 
     //create page
     let mut context = Context::new();
@@ -169,6 +182,9 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
         context.insert("champ_1", &champ_1.unwrap());
         context.insert("champ_2", &champ_2.unwrap());
     }
+
+    println!("{:#?} {:#?}", champ_1, champ_map.get(champ_1.unwrap()));
+    println!("{:#?} {:#?}", champ_2, champ_map.get(champ_2.unwrap()));
 
     let rendered = state.templates.render("base.html", &context).unwrap();
     Html(rendered)

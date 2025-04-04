@@ -10,10 +10,25 @@
   z-index: 1;
 }
 
+.result_container{
+  display: grid;
+  grid-template: 1fr 1fr;
+  grid-column-start: 2;
+  grid-row-start: 1;
+  height: 90vh;
+  width: 12vw;
+}
+
 .stats {
   grid-column-start: 2;
   grid-row-start: 1;
-  justify-items: center;
+  height: 70vh;
+  width: 12vw;
+}
+
+.result_container img {
+  height: 2rem;
+  width: 2rem;
 }
 
 .guesses { 
@@ -35,31 +50,28 @@
   box-shadow: 2px 4px 1rem black;
 }
 
+
 .champion img {
   border: solid 4px #c8aa6e;
   border-radius: 2rem;
   width: 40vw;
-  margin: 1vw;
+  margin: 1.5vw;
   box-shadow: 2px 8px 1rem black;
 }
 
 .result {
   display: flex;
+  text-align: center;
+  font-size: 1rem;
   flex-direction: column;
-  border: solid 1px black;
-}
-
-.stats img {
-  height: 2rem;
-  width: 2rem;
-}
-
-label {
-  color: white;
-  text-shadow: 2px 4px black;
+  border: solid 4px #c8aa6e;
   margin: 4px;
-  font-family: tahoma;
-  font-size: 2rem;
+  padding: 4px;
+  border-radius: 1rem;
+}
+
+.score{
+  text-align: center;
 }
 
 button {
@@ -72,13 +84,21 @@ button {
   border-radius: 0.5rem;
 }
 
+button#check_them_stats{
+  display: none;
+}
+
 button:hover {
   background: #e0d2b5;
+  box-shadow: 4px 4px 1.5rem #e0d2b5;
+}
+
+#comment{
+  text-align: center;
 }
 
 form {
-  display: grid;
-  grid-template: 1fr;
+  width:12vw;
   justify-items: center;
 }
 
@@ -86,6 +106,10 @@ body {
   margin: 0px;
   position:relative;
   background-color: black;
+  color: white;
+  text-shadow: 2px 4px black;
+  font-family: tahoma;
+  font-size: 1rem;
 }
 
 .background{
@@ -105,3 +129,15 @@ input{
   opacity: 0;
 }
 
+footer{
+  position: fixed;
+  bottom: 0;
+  left:0;
+  right: 0;
+  height: 5vh;
+  text-align: center;
+}
+
+a {
+  color: #d199ff;
+}
