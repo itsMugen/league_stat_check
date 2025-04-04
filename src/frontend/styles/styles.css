@@ -15,7 +15,7 @@
   grid-template: 1fr 1fr;
   grid-column-start: 2;
   grid-row-start: 1;
-  height: 90vh;
+  height: 85vh;
   width: 12vw;
 }
 
@@ -50,13 +50,17 @@
   box-shadow: 2px 4px 1rem black;
 }
 
-
-.champion img {
+.champion{
+  margin: 1.5vw;
   border: solid 4px #c8aa6e;
   border-radius: 2rem;
   width: 40vw;
-  margin: 1.5vw;
   box-shadow: 2px 8px 1rem black;
+}
+
+.champion img {
+  border-radius: 2rem;
+  width: 40vw;
 }
 
 .result {
