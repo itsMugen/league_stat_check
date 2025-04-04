@@ -61,6 +61,7 @@
 .champion img {
   border-radius: 2rem;
   width: 40vw;
+  height: 24vw;
 }
 
 .result {
