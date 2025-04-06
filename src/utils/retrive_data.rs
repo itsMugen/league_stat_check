@@ -1,14 +1,15 @@
-pub fn retrive_last_patch() {
+pub async fn retrive_last_patch() -> reqwest::Response {
     let last_patch = reqwest::get("https://ddragon.leagueoflegends.com/api/versions.json");
-    println!("{:#?}", last_patch);
+    last_patch.await.unwrap()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn test_retrive() {
-        retrive_last_patch();
+    #[tokio::test]
+    async fn test_retrive() {
+        let response = retrive_last_patch().await;
+        println!("{:#?}", response.json::<Vec<String>>().await.unwrap()[0]);
         assert!( 1 == 1);
     }
 }
