@@ -1,2 +1,4 @@
 /target
 /attic
+#stop all the game data from being loaded
+assets/data_tarball
