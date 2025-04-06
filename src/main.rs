@@ -163,7 +163,7 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
     //pick 2 random champs
     let champ_map = state.champion_list.clone();
     let mut rng = rand::rng();
-    let mut champ_names: Vec<String> = champ_map.clone().into_keys().collect();
+    let mut champ_names: Vec<String> = champ_map.into_keys().collect();
     champ_names.shuffle(&mut rng);
     let mut champs = champ_names.choose_multiple(&mut rng, 2);
     let champ_1 = champs.next();
