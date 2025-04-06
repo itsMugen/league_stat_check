@@ -1,2 +1,4 @@
 /target
-/attic/*
+# keep folder structure
+!attic/
+attic/*
