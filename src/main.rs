@@ -13,6 +13,7 @@ use std::fs;
 use std::sync::Arc;
 use tera::{Context, Tera};
 use tower_http::services::ServeDir;
+use crate::utils::retrive_data::retrive_last_patch;
 
 #[derive(Deserialize, Debug, Clone)]
 struct Stats {
@@ -82,7 +83,7 @@ struct AppState {
 #[tokio::main]
 async fn main() {
     let templates = Tera::new("src/frontend/templates/*.html").unwrap();
-    let champion_list = aggregate_data();
+    let champion_list = aggregate_data().await;
     let state = Arc::new(AppState {
         templates,
         champion_list,
@@ -94,11 +95,11 @@ async fn main() {
         .route("/stat_check", get(stat_check))
         .route("/check_stats", post(check_stat))
         .nest_service("/styles", ServeDir::new("src/frontend/styles"))
-        .nest_service("/champ_images", ServeDir::new("attic/img/champion/centered"))
-        .nest_service("/stats", ServeDir::new("attic/img/perk-images/StatMods"))
-        .nest_service("/items", ServeDir::new("attic/15.5.1/img/item"))
+        .nest_service("/champ_images", ServeDir::new("assets/data_tarball/img/champion/centered"))
+        .nest_service("/stats", ServeDir::new("assets/data_tarball/img/perk-images/StatMods"))
+        .nest_service("/items", ServeDir::new(format!("assets/data_tarball/{}/img/item", retrive_last_patch().await)))
         .nest_service("/scripts", ServeDir::new("src/frontend/scripts"))
-        //eventually all used assets will be moved under assets
+        //eventually all used assets/data_tarball will be moved under assets
         .nest_service("/assets", ServeDir::new("assets/"))
         .with_state(state);
 
@@ -188,8 +189,9 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
     Html(rendered)
 }
 
-fn aggregate_data() -> HashMap<String, Stats> {
-    let champs_dir = fs::read_dir("attic/15.5.1/data/en_US/champion").unwrap();
+async fn aggregate_data() -> HashMap<String, Stats> {
+    println!("{:#?}", format!("assets/data_tarball/{}/data/en_US/champion", retrive_last_patch().await));
+    let champs_dir = fs::read_dir(format!("assets/data_tarball/{}/data/en_US/champion", retrive_last_patch().await)).unwrap();
     let mut champs: HashMap<String, Stats> = HashMap::new();
     for champ_path in champs_dir {
         let path = champ_path.unwrap();
