@@ -1,8 +1,3 @@
-**Stack**:
-- [[Rust]]
-- [[htmx]]
-- html, js, css
-
 **Possible add-ons**:
 - new game mods
 - mobile version 
