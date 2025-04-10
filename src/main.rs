@@ -1,6 +1,6 @@
 mod handlers;
 mod utils;
-use crate::utils::retrive_data::retrive_last_patch;
+use crate::utils::retrive_data::{retrive_last_patch, get_data_tarball};
 use axum::{
     routing::{get, post},
     Router,
@@ -12,6 +12,7 @@ use std::sync::Arc;
 use tera::Tera;
 use tower_http::services::ServeDir;
 use utils::data_parsing::aggregate_data;
+use std::fs;
 
 #[derive(Deserialize, Debug, Clone)]
 struct Stats {
@@ -52,7 +53,13 @@ async fn main() {
     //load the html pages
     let templates = Tera::new("src/frontend/templates/*.html").unwrap();
 
-    //check if the data needed for the game is present
+    //check if the data needed for the game is present and
+    //if it is up to date
+    let current_patch = retrive_last_patch().await;
+    if !fs::exists(format!("assets/data_tarball/{}", current_patch)).unwrap(){
+        get_data_tarball().await;
+    }
+    
 
     // aggregate_data() creates the structure needed to query champions
     // data starting from the given jsons
@@ -79,7 +86,7 @@ async fn main() {
             "/items",
             ServeDir::new(format!(
                 "assets/data_tarball/{}/img/item",
-                retrive_last_patch().await
+                current_patch
             )),
         )
         .nest_service("/scripts", ServeDir::new("src/frontend/scripts"))
