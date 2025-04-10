@@ -1,5 +1,45 @@
+use crate::AppState;
+use axum::extract::State;
+use axum::response::Html;
+use axum::response::IntoResponse;
+use axum::Form;
+use rand::prelude::*;
+use serde::Deserialize;
+use std::sync::Arc;
+use tera::Context;
 
-async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
+#[derive(Deserialize, Debug, Clone)]
+pub struct CheckStats {
+    champ_1: String,
+    champ_2: String,
+    armor: String,
+    attackrange: String,
+    attackdamage: String,
+    attackspeed: String,
+    hp: String,
+    hpregen: String,
+    movespeed: String,
+    resource_bar: String,
+    magic_resist: String,
+}
+
+impl CheckStats {
+    pub fn get_guesses(self) -> [String; 9] {
+        [
+            self.armor,
+            self.attackrange,
+            self.attackdamage,
+            self.attackspeed,
+            self.hp,
+            self.hpregen,
+            self.movespeed,
+            self.resource_bar,
+            self.magic_resist,
+        ]
+    }
+}
+
+pub async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
     //pick 2 random champs
     let champ_map = state.champion_list.clone();
     let mut rng = rand::rng();
@@ -8,7 +48,6 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
     let mut champs = champ_names.choose_multiple(&mut rng, 2);
     let champ_1 = champs.next();
     let champ_2 = champs.next();
-    
 
     //create page
     let mut context = Context::new();
@@ -27,7 +66,7 @@ async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
     Html(rendered)
 }
 
-async fn check_stat(
+pub async fn check_stat(
     State(state): State<Arc<AppState>>,
     Form(payload): Form<CheckStats>,
 ) -> impl IntoResponse {
@@ -47,22 +86,22 @@ async fn check_stat(
         }
     }
 
-    let mut score : Vec<bool> = Vec::new();
+    let mut score: Vec<bool> = Vec::new();
     let mut score_count: i8 = 0;
-    for (guess, truth) in payload.clone().get_guesses().iter().zip(checked.iter_mut()){
+    for (guess, truth) in payload.clone().get_guesses().iter().zip(checked.iter_mut()) {
         if guess == truth {
             score.push(true);
-            score_count+=1;
+            score_count += 1;
         } else {
             score.push(false);
         }
     }
 
-    let comment : &str;
+    let comment: &str;
 
     match score_count {
         0 => comment = "are you even trying?",
-        1..=3 =>  comment = "I've seen better iron players",
+        1..=3 => comment = "I've seen better iron players",
         4..=6 => comment = "Truly a coinflipper",
         7..=8 => comment = "You might actually know something",
         9 => comment = "Meh.. just lucky admit it",
@@ -79,5 +118,3 @@ async fn check_stat(
 
     Html(rendered)
 }
-
-
