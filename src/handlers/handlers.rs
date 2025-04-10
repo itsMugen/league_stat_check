@@ -51,16 +51,8 @@ pub async fn stat_check(State(state): State<Arc<AppState>>) -> Html<String> {
 
     //create page
     let mut context = Context::new();
-    if champ_1.unwrap() == "Fiddlesticks" {
-        context.insert("champ_1", "FiddleSticks");
-        context.insert("champ_2", &champ_2.unwrap());
-    } else if champ_2.unwrap() == "Fiddlesticks" {
-        context.insert("champ_1", &champ_1.unwrap());
-        context.insert("champ_2", "FiddleSticks");
-    } else {
-        context.insert("champ_1", &champ_1.unwrap());
-        context.insert("champ_2", &champ_2.unwrap());
-    }
+    context.insert("champ_1", &champ_1.unwrap());
+    context.insert("champ_2", &champ_2.unwrap());
 
     let rendered = state.templates.render("base.html", &context).unwrap();
     Html(rendered)
