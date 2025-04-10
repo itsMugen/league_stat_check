@@ -1,6 +1,6 @@
 mod handlers;
 mod utils;
-use crate::utils::retrive_data::{retrive_last_patch, get_data_tarball};
+use crate::utils::retrive_data::{get_data_tarball, retrive_last_patch};
 use axum::{
     routing::{get, post},
     Router,
@@ -8,11 +8,11 @@ use axum::{
 use handlers::handlers::{check_stat, stat_check};
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::fs;
 use std::sync::Arc;
 use tera::Tera;
 use tower_http::services::ServeDir;
 use utils::data_parsing::aggregate_data;
-use std::fs;
 
 #[derive(Deserialize, Debug, Clone)]
 struct Stats {
@@ -56,13 +56,11 @@ async fn main() {
     //check if the data needed for the game is present and
     //if it is up to date
     let current_patch = retrive_last_patch().await;
-    if !fs::exists(format!("assets/data_tarball/{}", current_patch)).unwrap(){
+    if !fs::exists(format!("assets/data_tarball/{}", current_patch)).unwrap() {
         get_data_tarball().await;
     }
-    
 
     // aggregate_data() creates the structure needed to query champions
-    // data starting from the given jsons
     let champion_list = aggregate_data().await;
     let state = Arc::new(AppState {
         templates,
@@ -84,21 +82,13 @@ async fn main() {
         )
         .nest_service(
             "/items",
-            ServeDir::new(format!(
-                "assets/data_tarball/{}/img/item",
-                current_patch
-            )),
+            ServeDir::new(format!("assets/data_tarball/{}/img/item", current_patch)),
         )
         .nest_service("/scripts", ServeDir::new("src/frontend/scripts"))
         //eventually all used assets/data_tarball will be moved under assets
         .nest_service("/assets", ServeDir::new("assets/"))
         .with_state(state);
 
-    // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
-}
-
-fn _print_type<T>(_: &T) {
-    println!("{:?}", std::any::type_name::<T>());
 }

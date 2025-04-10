@@ -17,6 +17,7 @@ pub async fn get_data_tarball(){
 
     let mut archive = Archive::new(decompressed);
     archive.unpack("assets/data_tarball").unwrap();
+    println!("The game is ready, LETS HAVE FUN");
 }
 
 
